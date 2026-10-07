@@ -97,6 +97,20 @@ Defaults can be overridden with environment variables:
 - `KAFKA_PARTITIONS` — default `3`
 - `KAFKA_REPLICATION_FACTOR` — default `1`
 - `SERVER_PORT` — default `8080`
+- `OPENAI_API_KEY` — enables live OpenAI incident analysis; unset uses the local rule-based analyzer
+- `OPENAI_MODEL` — OpenAI chat model; default `gpt-4o-mini`
+- `OPENAI_BASE_URL` — OpenAI-compatible API base URL; default `https://api.openai.com/v1`
+
+### Enable live LLM analysis on Windows
+
+Set the API key in the same PowerShell window used to start the app, then run it:
+
+```powershell
+$env:OPENAI_API_KEY = "your-api-key"
+mvnw.cmd spring-boot:run
+```
+
+Incidents published to Kafka are sent synchronously to the configured chat model by `OpenAiIncidentAnalyzer`. If the key is unset, the local analyzer is selected. If a live call fails or returns invalid analysis JSON, the application logs the failure and uses the local analyzer for that incident.
 
 ## Tests
 
