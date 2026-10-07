@@ -1,0 +1,165 @@
+{
+  "info": {
+    "_postman_id": "7d2c6d9e-7d1e-4f1a-9d8d-incident-day7",
+    "name": "AI Incident Resolution Agent - Day 7",
+    "description": "Postman collection for the Day 7 Spring Boot Kafka incident-events API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Create High Severity Incident",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"incidentId\": \"INC-1001\",\n  \"service\": \"payments\",\n  \"severity\": \"HIGH\",\n  \"message\": \"Payment API timeout while processing card payments\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/incidents",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "incidents"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2. Create Critical Incident",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"incidentId\": \"INC-1002\",\n  \"service\": \"orders\",\n  \"severity\": \"CRITICAL\",\n  \"message\": \"Order service is completely unavailable and all requests are failing\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/incidents",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "incidents"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3. Create Low Severity Incident",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"incidentId\": \"INC-1003\",\n  \"service\": \"notifications\",\n  \"severity\": \"LOW\",\n  \"message\": \"Email queue is slightly delayed but operational\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/incidents",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "incidents"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "4. Invalid Incident - Missing Severity",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"incidentId\": \"INC-1004\",\n  \"service\": \"inventory\",\n  \"message\": \"Inventory check is failing under load\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/incidents",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "incidents"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5. Actuator Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/actuator/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "actuator",
+            "health"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "6. Actuator Info",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/actuator/info",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "actuator",
+            "info"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
