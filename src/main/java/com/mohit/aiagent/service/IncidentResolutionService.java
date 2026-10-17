@@ -3,8 +3,13 @@ package com.mohit.aiagent.service;
 import com.mohit.aiagent.model.IncidentEvent;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class IncidentResolutionService {
+
+    private static final Logger log = LoggerFactory.getLogger(IncidentResolutionService.class);
 
     private final IncidentAnalyzerClient analyzerClient;
 
@@ -12,10 +17,14 @@ public class IncidentResolutionService {
         this.analyzerClient = analyzerClient;
     }
 
-    public String analyze(IncidentEvent event) {
+    public IncidentAnalysisResult analyze(IncidentEvent event) {
+        log.info("Starting incident resolution for event: {}", event);
         IncidentAnalysisResult analysis = analyzerClient.analyze(event);
-        return "AI analysis: " + analysis.summary()
-                + " Confidence: " + analysis.confidence()
-                + " Recommended actions: " + String.join(" | ", analysis.recommendedActions());
+        log.info("Completed incident resolution for {}: summary={}, severity={}, confidence={}",
+                event == null ? "unknown" : event.incidentId(),
+                analysis.summary(),
+                analysis.severity(),
+                analysis.confidence());
+        return analysis;
     }
 }

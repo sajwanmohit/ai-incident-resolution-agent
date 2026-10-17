@@ -3,6 +3,7 @@ package com.mohit.aiagent.kafka;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mohit.aiagent.model.IncidentEvent;
+import com.mohit.aiagent.service.IncidentAnalysisResult;
 import com.mohit.aiagent.service.IncidentResolutionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,12 +29,13 @@ public class KafkaIncidentConsumer {
             groupId = "${spring.kafka.consumer.group-id}"
     )
     public void consume(String message) {
+        log.info("Kafka consumer received raw message: {}", message);
         try {
             IncidentEvent event = objectMapper.readValue(message, IncidentEvent.class);
             log.info("Consumed incident event: {}", event);
 
-            String resolution = resolutionService.analyze(event);
-            log.info("Incident resolution: {}", resolution);
+            IncidentAnalysisResult analysis = resolutionService.analyze(event);
+            log.info("Incident analysis result: {}", analysis);
         } catch (JsonProcessingException e) {
             log.error("Failed to parse incident event: {}", message, e);
             throw new IllegalArgumentException("Invalid incident event payload", e);
