@@ -29,8 +29,14 @@ class IncidentControllerTest {
     @Test
     void acceptsValidIncident() throws Exception {
         when(resolutionService.analyze(any(IncidentEvent.class)))
-                .thenReturn(new IncidentAnalysisResult("HIGH", 0.9, "Payment API timeout",
-                        List.of("Check payment provider latency")));
+                .thenReturn(new IncidentAnalysisResult(
+                        "HIGH",
+                        0.9,
+                        "Payment API timeout",
+                        List.of("Check payment provider latency"),
+                        "Upstream payment API latency caused the timeout.",
+                        List.of("Incident severity is HIGH", "Service is payments", "Message indicates timeout")
+                ));
 
         mockMvc.perform(post("/api/v1/incidents")
                 .contentType(MediaType.APPLICATION_JSON)

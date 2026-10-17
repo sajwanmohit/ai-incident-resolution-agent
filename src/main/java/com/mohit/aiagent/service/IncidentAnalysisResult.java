@@ -9,8 +9,4 @@ public record IncidentAnalysisResult(
         List<String> recommendedActions,
         String rootCause,
         List<String> evidence
-) {
-    public IncidentAnalysisResult(String severity, double confidence, String summary, List<String> recommendedActions) {
-        this(severity, confidence, summary, recommendedActions, "", List.of());
-    }
-}
+) {}
