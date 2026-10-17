@@ -97,20 +97,20 @@ Defaults can be overridden with environment variables:
 - `KAFKA_PARTITIONS` — default `3`
 - `KAFKA_REPLICATION_FACTOR` — default `1`
 - `SERVER_PORT` — default `8080`
-- `OPENAI_API_KEY` — enables live OpenAI incident analysis; unset uses the local rule-based analyzer
-- `OPENAI_MODEL` — OpenAI chat model; default `gpt-4o-mini`
-- `OPENAI_BASE_URL` — OpenAI-compatible API base URL; default `https://api.openai.com/v1`
+- `OPENAI_API_KEY` — optional bearer token for the OpenAI-compatible endpoint; defaults to `docker-model-runner` (no real OpenAI key is needed)
+- `OPENAI_MODEL` — chat model; default `docker.io/ai/qwen3:latest`
+- `OPENAI_BASE_URL` — OpenAI-compatible API base URL; default `http://localhost:12434/engines/v1`
+- `OPENAI_TEMPERATURE` — sampling temperature; default `0.2`
 
-### Enable live LLM analysis on Windows
+### Use Docker Model Runner for incident analysis
 
-Set the API key in the same PowerShell window used to start the app, then run it:
+Docker Model Runner must be running locally with `docker.io/ai/qwen3:latest` available. The application uses Spring AI's OpenAI-compatible integration and sends chat completions to `/engines/v1/chat/completions`. Start the application with:
 
-```powershell
-$env:OPENAI_API_KEY = "your-api-key"
-mvnw.cmd spring-boot:run
+```bash
+mvn spring-boot:run
 ```
 
-Incidents published to Kafka are sent synchronously to the configured chat model by `OpenAiIncidentAnalyzer`. If the key is unset, the local analyzer is selected. If a live call fails or returns invalid analysis JSON, the application logs the failure and uses the local analyzer for that incident.
+The existing `POST /api/v1/incidents` endpoint publishes the incident to Kafka and synchronously sends it to Qwen3 for analysis. If the LLM call fails or returns invalid analysis JSON, the application logs the failure and uses its local rule-based analyzer for that incident. The endpoint returns HTTP `200` with the analysis result.
 
 ## Tests
 

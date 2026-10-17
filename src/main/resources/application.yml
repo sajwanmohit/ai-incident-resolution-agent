@@ -2,17 +2,14 @@ spring:
   application:
     name: ai-incident-resolution-agent
   ai:
-    ollama:
-      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+    openai:
+      api-key: ${OPENAI_API_KEY:docker-model-runner}
+      base-url: ${OPENAI_BASE_URL:http://localhost:12434/engines/v1}
       chat:
+        completions-path: /chat/completions
         options:
-          model: ${OLLAMA_MODEL:qwen3:8b}
-#    openai:
-#      api-key: ${OPENAI_API_KEY:}
-#      base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
-#      chat:
-#        options:
-#          model: ${OPENAI_MODEL:gpt-4o-mini}
+          model: ${OPENAI_MODEL:docker.io/ai/qwen3:latest}
+          temperature: ${OPENAI_TEMPERATURE:0.2}
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
