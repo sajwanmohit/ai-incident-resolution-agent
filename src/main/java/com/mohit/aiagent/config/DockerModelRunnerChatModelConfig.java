@@ -1,5 +1,7 @@
 package com.mohit.aiagent.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
@@ -11,6 +13,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DockerModelRunnerChatModelConfig {
 
+    private static final Logger log = LoggerFactory.getLogger(DockerModelRunnerChatModelConfig.class);
+
     @Bean
     @ConditionalOnMissingBean(OpenAiChatModel.class)
     public OpenAiChatModel dockerModelRunnerChatModel(
@@ -20,6 +24,8 @@ public class DockerModelRunnerChatModelConfig {
             @Value("${spring.ai.openai.chat.options.model:docker.io/ai/qwen3:latest}") String model,
             @Value("${spring.ai.openai.chat.options.temperature:0.2}") double temperature
     ) {
+        log.info("Initializing local Docker Model Runner OpenAI-compatible client: baseUrl={}, completionsPath={}, model={}, temperature={}",
+                baseUrl, completionsPath, model, temperature);
         return OpenAiChatModel.builder()
                 .openAiApi(OpenAiApi.builder()
                         .apiKey(apiKey)

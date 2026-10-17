@@ -35,6 +35,7 @@ public class OpenAiIncidentAnalyzer implements IncidentAnalyzerClient {
     public IncidentAnalysisResult analyze(IncidentEvent event) {
         String incidentId = event == null ? "unknown" : event.incidentId();
         log.info("OpenAI analyzer invoked for incident {}", incidentId);
+        log.info("Calling local Docker Model Runner/OpenAI endpoint for incident {} using model configured on ChatModel", incidentId);
         try {
             String incidentJson = objectMapper.writeValueAsString(event);
             log.debug("OpenAI incident payload for {}: {}", incidentId, incidentJson);
