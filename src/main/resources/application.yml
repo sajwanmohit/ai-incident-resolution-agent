@@ -30,4 +30,4 @@ app:
   kafka:
     topic: ${KAFKA_TOPIC:incident-events}
     partitions: ${KAFKA_PARTITIONS:2}
-    replication-factor: ${KAFKA_REPLICATION_FACTOR:1}
+    replication-factor: ${KAFKA_REPLICATION_FACTOR:2}
