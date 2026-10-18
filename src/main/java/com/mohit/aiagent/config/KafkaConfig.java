@@ -23,6 +23,11 @@ import org.springframework.util.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 @Configuration
 public class KafkaConfig {
 
@@ -48,6 +53,9 @@ public class KafkaConfig {
 
     @Value("${KAFKA_SSL_CA_LOCATION:}")
     private String kafkaSslCaLocation;
+
+    @Value("${KAFKA_CA_CERTIFICATE:${KAFKA_SSL_CA_LOCATION:}}")
+    private String kafkaCaCertificate;
 
     @Bean
     public ProducerFactory<String, String> producerFactory() {
@@ -102,6 +110,7 @@ public class KafkaConfig {
                 || StringUtils.hasText(kafkaSaslMechanism)
                 || StringUtils.hasText(kafkaUsername)
                 || StringUtils.hasText(kafkaPassword)
+                || StringUtils.hasText(kafkaCaCertificate)
                 || StringUtils.hasText(kafkaSslCaLocation);
 
         if (isLocalKafka || !hasExplicitSecurityConfig) {
@@ -122,11 +131,40 @@ public class KafkaConfig {
             );
             props.put(SaslConfigs.SASL_JAAS_CONFIG, jaasConfig);
         }
-        if (StringUtils.hasText(kafkaSslCaLocation)) {
+        String trustStoreLocation = resolveTrustStoreLocation(kafkaCaCertificate);
+        if (StringUtils.hasText(trustStoreLocation)) {
             props.put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, "PEM");
-            props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, kafkaSslCaLocation);
+            props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, trustStoreLocation);
         }
 
         log.info("Configured Kafka SASL/SSL settings for non-local bootstrap server: {}", bootstrapServers);
+    }
+
+    private String resolveTrustStoreLocation(String configuredValue) {
+        if (!StringUtils.hasText(configuredValue)) {
+            return "";
+        }
+
+        String trimmed = configuredValue.trim();
+        String normalizedPem = trimmed.replace("\\n", System.lineSeparator());
+
+        if (normalizedPem.contains("-----BEGIN CERTIFICATE-----") && normalizedPem.contains("-----END CERTIFICATE-----")) {
+            try {
+                Path tempCertFile = Files.createTempFile("aiven-ca-", ".pem");
+                Files.writeString(tempCertFile, normalizedPem, StandardCharsets.UTF_8);
+                log.info("Wrote Kafka CA certificate to temporary file: {}", tempCertFile);
+                return tempCertFile.toString();
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to write Kafka CA certificate to a temporary file", e);
+            }
+        }
+
+        Path configuredPath = Path.of(trimmed);
+        if (Files.exists(configuredPath)) {
+            return trimmed;
+        }
+
+        log.warn("Kafka CA certificate value does not point to an existing file and does not look like PEM content: {}", trimmed);
+        return trimmed;
     }
 }
