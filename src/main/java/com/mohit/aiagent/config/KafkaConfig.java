@@ -123,7 +123,8 @@ public class KafkaConfig {
             props.put(SaslConfigs.SASL_JAAS_CONFIG, jaasConfig);
         }
         if (StringUtils.hasText(kafkaSslCaLocation)) {
-            props.put("ssl.ca.location", kafkaSslCaLocation);
+            props.put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, "PEM");
+            props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, kafkaSslCaLocation);
         }
 
         log.info("Configured Kafka SASL/SSL settings for non-local bootstrap server: {}", bootstrapServers);
