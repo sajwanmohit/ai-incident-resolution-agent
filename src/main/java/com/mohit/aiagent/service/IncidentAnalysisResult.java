@@ -6,5 +6,7 @@ public record IncidentAnalysisResult(
         String severity,
         double confidence,
         String summary,
-        List<String> recommendedActions
+        List<String> recommendedActions,
+        String rootCause,
+        List<String> evidence
 ) {}

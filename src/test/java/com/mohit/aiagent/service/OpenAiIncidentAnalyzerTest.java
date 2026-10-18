@@ -27,12 +27,11 @@ class OpenAiIncidentAnalyzerTest {
         when(chatResponse.getResult()).thenReturn(generation);
         when(generation.getOutput()).thenReturn(assistantMessage);
         when(assistantMessage.getText()).thenReturn("""
-                {"severity":"HIGH","confidence":0.91,"summary":"Payment API timeout","recommendedActions":["Check payment provider latency"]}
+                {"severity":"HIGH","confidence":0.91,"summary":"Payment API timeout","rootCause":"Upstream payment API latency caused the timeout.","evidence":["Incident severity is HIGH","Service is payments","Message indicates timeout"],"recommendedActions":["Check payment provider latency","Verify upstream dependency health","Review recent deployment and alert history"]}
                 """);
 
         OpenAiIncidentAnalyzer analyzer = new OpenAiIncidentAnalyzer(
                 chatModel,
-                new IncidentAnalysisService(),
                 new ObjectMapper()
         );
 
