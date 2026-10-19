@@ -54,15 +54,58 @@ class IncidentControllerTest {
     }
 
     @Test
+    void allowsLocalOriginPreflight() throws Exception {
+        mockMvc.perform(options("/api/v1/incidents")
+                        .header(HttpHeaders.ORIGIN, "http://localhost:5173")
+                        .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "POST")
+                        .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "Content-Type, Accept"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:5173"))
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, "GET,POST,OPTIONS"))
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "Content-Type, Accept"));
+    }
+
+    @Test
     void allowsConfiguredVercelOriginAndPreflight() throws Exception {
         mockMvc.perform(options("/api/v1/incidents")
                         .header(HttpHeaders.ORIGIN, "https://ai-incident-dashboard-ashy.vercel.app")
                         .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "POST")
-                        .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "Content-Type, Authorization"))
+                        .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "Content-Type, Accept"))
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "https://ai-incident-dashboard-ashy.vercel.app"))
-                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, "GET,POST,PUT,PATCH,DELETE,OPTIONS"))
-                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "Content-Type, Authorization"));
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, "GET,POST,OPTIONS"))
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "Content-Type, Accept"));
+    }
+
+    @Test
+    void acceptsPostFromLocalAndVercelOrigins() throws Exception {
+        when(resolutionService.analyze(any(IncidentEvent.class)))
+                .thenReturn(new IncidentAnalysisResult(
+                        "HIGH",
+                        0.9,
+                        "Payment API timeout",
+                        List.of("Check payment provider latency"),
+                        "Upstream payment API latency caused the timeout.",
+                        List.of("Incident severity is HIGH", "Service is payments", "Message indicates timeout")
+                ));
+
+        mockMvc.perform(post("/api/v1/incidents")
+                        .header(HttpHeaders.ORIGIN, "http://localhost:5173")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content("{\"incidentId\":\"INC-LOCAL\",\"service\":\"payments\",\"severity\":\"HIGH\",\"message\":\"timeout\"}"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:5173"))
+                .andExpect(jsonPath("$.summary").value("Payment API timeout"));
+
+        mockMvc.perform(post("/api/v1/incidents")
+                        .header(HttpHeaders.ORIGIN, "https://ai-incident-dashboard-ashy.vercel.app")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content("{\"incidentId\":\"INC-VERCEL\",\"service\":\"payments\",\"severity\":\"HIGH\",\"message\":\"timeout\"}"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "https://ai-incident-dashboard-ashy.vercel.app"))
+                .andExpect(jsonPath("$.summary").value("Payment API timeout"));
     }
 
     @Test
@@ -70,6 +113,7 @@ class IncidentControllerTest {
         mockMvc.perform(post("/api/v1/incidents")
                         .header(HttpHeaders.ORIGIN, "https://not-allowed.example.com")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
                         .content("{\"incidentId\":\"INC-2\",\"service\":\"payments\",\"severity\":\"HIGH\",\"message\":\"timeout\"}"))
                 .andExpect(status().isForbidden());
     }
