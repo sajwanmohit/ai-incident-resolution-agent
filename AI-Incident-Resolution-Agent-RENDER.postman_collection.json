@@ -1,0 +1,223 @@
+{
+  "info": {
+    "_postman_id": "render-ai-incident-resolution-agent",
+    "name": "AI Incident Resolution Agent - Render",
+    "description": "Postman collection for the deployed Render app with sample incidents.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://ai-incident-resolution-agent.onrender.com",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Create High Severity Incident",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"incidentId\": \"INC-1001\",\n  \"service\": \"payments\",\n  \"severity\": \"HIGH\",\n  \"message\": \"Payment API timeout while processing card payments\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/incidents",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "incidents"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2. Create Critical Incident",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"incidentId\": \"INC-1002\",\n  \"service\": \"orders\",\n  \"severity\": \"CRITICAL\",\n  \"message\": \"Order service is completely unavailable and all requests are failing\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/incidents",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "incidents"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3. Create Medium Severity Incident",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"incidentId\": \"INC-1003\",\n  \"service\": \"notifications\",\n  \"severity\": \"MEDIUM\",\n  \"message\": \"Email delivery is delayed for 12 minutes across multiple regions\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/incidents",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "incidents"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "4. Create Low Severity Incident",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"incidentId\": \"INC-1004\",\n  \"service\": \"inventory\",\n  \"severity\": \"LOW\",\n  \"message\": \"Inventory cache refresh is a few minutes behind normal SLA\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/incidents",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "incidents"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5. Invalid Incident - Missing Severity",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"incidentId\": \"INC-1005\",\n  \"service\": \"inventory\",\n  \"message\": \"Inventory check is failing under load\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/incidents",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "incidents"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "6. Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/actuator/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "actuator",
+            "health"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "7. App Info",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/actuator/info",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "actuator",
+            "info"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "8. Stop Local LLM (Admin)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/admin/llm/stop",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "admin",
+            "llm",
+            "stop"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
+
