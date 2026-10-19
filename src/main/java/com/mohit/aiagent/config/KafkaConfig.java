@@ -132,6 +132,9 @@ public class KafkaConfig {
             props.put(SaslConfigs.SASL_JAAS_CONFIG, jaasConfig);
         }
         String trustStoreLocation = resolveTrustStoreLocation(kafkaCaCertificate);
+        if (!StringUtils.hasText(trustStoreLocation)) {
+            trustStoreLocation = resolveTrustStoreLocation(kafkaSslCaLocation);
+        }
         if (StringUtils.hasText(trustStoreLocation)) {
             props.put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, "PEM");
             props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, trustStoreLocation);
@@ -160,11 +163,15 @@ public class KafkaConfig {
         }
 
         Path configuredPath = Path.of(trimmed);
-        if (Files.exists(configuredPath)) {
-            return trimmed;
+        if (!configuredPath.isAbsolute()) {
+            configuredPath = Path.of(System.getProperty("user.dir")).resolve(trimmed).normalize();
         }
 
-        log.warn("Kafka CA certificate value does not point to an existing file and does not look like PEM content: {}", trimmed);
-        return trimmed;
+        if (Files.isRegularFile(configuredPath)) {
+            return configuredPath.toString();
+        }
+
+        log.warn("Kafka CA certificate value is not a usable file path or PEM content and will be ignored: {}", trimmed);
+        return "";
     }
 }
